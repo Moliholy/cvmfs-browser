@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloud_browser',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -55,7 +56,9 @@ ROOT_URLCONF = 'browser.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            '/templates/',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,3 +103,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CLOUD_BROWSER_DATASTORE = "Filesystem"
+CLOUD_BROWSER_FILESYSTEM_ROOT = "/usr/share/doc"
