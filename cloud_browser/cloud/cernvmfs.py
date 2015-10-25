@@ -7,7 +7,7 @@ from cloud_browser.app_settings import settings
 from cloud_browser.cloud import errors, base
 from cloud_browser.common import SEP
 
-from cvmfs import repository
+from cvmfs import Repository
 
 
 ###############################################################################
@@ -32,36 +32,43 @@ wrap_fs_obj_errors = CVMFilesystemObjectWrapper()  # pylint: disable=C0103
 class CVMFilesystemObject(base.CloudObject):
     """CVMFilesystem object wrapper."""
 
+    def __init__(self, container, name, full_path, content_hash, size, **kwargs):
+        super(CVMFilesystemObject, self).__init__(container, name, **kwargs)
+        self.content_hash = content_hash
+        self.size = size
+        self.full_path = full_path
+
     def _get_object(self):
         """Return native storage object."""
         return object()
 
     def _read(self):
         """Return contents of object."""
-        with open(self.base_path, 'rb') as file_obj:
+        with self.container.conn.repository.retrieve_object(self.content_hash) \
+                as file_obj:
             return file_obj.read()
 
     @property
-    def base_path(self):
+    def path(self):
         """Base absolute path of container."""
-        return os.path.join(self.container.base_path, self.name)
+        return self.full_path
 
     @classmethod
     def from_path(cls, container, path):
         """Create object from path."""
-        from datetime import datetime
-
-        path = path.strip(SEP)
-        full_path = os.path.join(container.base_path, path)
-        last_modified = datetime.fromtimestamp(os.path.getmtime(full_path))
-        obj_type = cls.type_cls.SUBDIR if is_dir(full_path) \
+        if not path.startswith(container.base_path):
+            path = os.path.join(container.base_path, path)
+        dirent = container.conn.repository.lookup(path)
+        obj_type = cls.type_cls.SUBDIR if dirent.is_directory() \
             else cls.type_cls.FILE
 
         return cls(container,
-                   name=path,
-                   size=os.path.getsize(full_path),
+                   name=dirent.name,
+                   size=dirent.size,
+                   full_path=path,
+                   content_hash=dirent.content_hash,
                    content_type=None,
-                   last_modified=last_modified,
+                   last_modified=dirent.mtime,
                    obj_type=obj_type)
 
 
@@ -80,14 +87,14 @@ class CVMFilesystemContainer(base.CloudContainer):
         """Get objects."""
         def _filter(name):
             """Filter."""
-            return (not_dot(name) and
-                    (marker is None or
+            return ((marker is None or
                      os.path.join(path, name).strip(SEP) > marker.strip(SEP)))
 
         search_path = os.path.join(self.base_path, path)
-        objs = [self.obj_cls.from_path(self, os.path.join(path, o))
-                for o in os.listdir(search_path) if _filter(o)]
-        objs = sorted(objs, key=lambda x: x.base_path)
+        dir_names = [dirent.name for dirent in
+                     self.conn.repository.list_directory(search_path)]
+        objs = [self.obj_cls.from_path(self, os.path.join(search_path, o))
+                for o in dir_names if _filter(o)]
         return objs[:limit]
 
     @wrap_fs_obj_errors
@@ -98,14 +105,15 @@ class CVMFilesystemContainer(base.CloudContainer):
     @property
     def base_path(self):
         """Base absolute path of container."""
-        return os.path.join(self.conn.abs_root, self.name)
+        return os.path.join(SEP, self.name)
 
     @classmethod
     def from_path(cls, conn, path):
         """Create container from path."""
         path = path.strip(SEP)
-        full_path = os.path.join(conn.abs_root, path)
-        return cls(conn, path, 0, os.path.getsize(full_path))
+        full_path = os.path.join(SEP, path)
+        dirent = conn.repository.lookup(full_path)
+        return cls(conn=conn, name=path, count=0, size=dirent.size)
 
 
 class CVMFilesystemConnection(base.CloudConnection):
@@ -113,11 +121,12 @@ class CVMFilesystemConnection(base.CloudConnection):
     #: Container child class.
     cont_cls = CVMFilesystemContainer
 
-    def __init__(self, cache_dir):
+    def __init__(self, url, cache_dir):
         """Initializer."""
         super(CVMFilesystemConnection, self).__init__(None, None)
-        self.cache_dir = cache_dir
-        self.abs_cache_dir = os.path.abspath(cache_dir)
+        if url not in opened_repositories:
+            opened_repositories[url] = Repository(url, cache_dir)
+        self.repository = opened_repositories[url]
 
     def _get_connection(self):
         """Return native connection object."""
@@ -126,18 +135,16 @@ class CVMFilesystemConnection(base.CloudConnection):
     @wrap_fs_cont_errors
     def _get_containers(self):
         """Return available containers."""
-        full_fn = lambda p: os.path.join(self.abs_root, p)
-        return [self.cont_cls.from_path(self, d)
-                for d in os.listdir(self.abs_root) if is_dir(full_fn(d))]
+        # get the list of directories
+        root_list = [dirent.name for dirent in
+                     self.repository.list_directory('') if dirent.is_directory()]
+        return [self.cont_cls.from_path(self, d) for d in root_list]
 
     @wrap_fs_cont_errors
     def _get_container(self, path):
         """Return single container."""
-        path = path.strip(SEP)
-        if SEP in path:
-            raise errors.InvalidNameException(
-                "Path contains %s - %s" % (SEP, path))
         return self.cont_cls.from_path(self, path)
 
 
 opened_repositories = {}
+
