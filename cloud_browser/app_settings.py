@@ -169,6 +169,8 @@ class Settings(object):
         'CVMFilesystem',
     ))
 
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     #: Settings dictionary of accessor callables.
     SETTINGS = {
         # Datastore choice.
@@ -193,6 +195,11 @@ class Settings(object):
 
         # Filesystem datastore settings.
         'CLOUD_BROWSER_FILESYSTEM_ROOT': Setting(),
+
+        # Cvmfs datastore settings.
+        'CLOUD_BROWSER_CVMFILESYSTEM_REPOSITORY_URL': Setting(from_env=True),
+        'CLOUD_BROWSER_CVMFILESYSTEM_CACHE': Setting(from_env=True,
+                                                     default=os.path.join(BASE_DIR, 'cvmfs_cache')),
 
         # View permissions.
         'CLOUD_BROWSER_VIEW_DECORATOR': Setting(),

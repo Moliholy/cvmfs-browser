@@ -62,7 +62,7 @@ class Config(object):
             cache_dir = settings.CLOUD_BROWSER_CVMFS_CACHE
             conn_cls = CVMFilesystemConnection
             conn_fn = lambda: CVMFilesystemConnection(
-                'http://cvmfs-stratum-zero.cern.ch/cvmfs/atlas.cern.ch', cache_dir)
+                settings.CLOUD_BROWSER_CVMFS_REPOSITORY_URL, cache_dir)
 
         if conn_cls is None:
             raise ImproperlyConfigured(
