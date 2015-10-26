@@ -7,12 +7,12 @@ from cloud_browser.app_settings import settings
 # pylint: disable=invalid-name
 urlpatterns = patterns(
     'cloud_browser.views',
-    url(r'^$',
-        # pylint: disable=no-value-for-parameter
-        RedirectView.as_view(url='browser', permanent=True),
-        name="cloud_browser_index"),
-    url(r'^browser/(?P<path>.*)$', 'browser', name="cloud_browser_browser"),
-    url(r'^document/(?P<path>.*)$', 'document', name="cloud_browser_document"),
+    url(r'^browser/(?P<repo_name>[a-z\.\-]+)$',
+        'browser', name="cloud_browser_browser"),
+    url(r'^browser/(?P<repo_name>[a-z\.\-]+)/(?P<revision>[^\/]*)/(?P<path>.*)$',
+        'browser', name="cloud_browser_browser"),
+    url(r'^document/(?P<repo_name>[a-z\.\-]+)/(?P<revision>[^\/]*)/(?P<path>.*)$',
+        'document', name="cloud_browser_document"),
 )
 
 if settings.app_media_url is None:

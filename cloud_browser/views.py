@@ -56,7 +56,7 @@ def _breadcrumbs(path):
 
 
 @settings_view_decorator
-def browser(request, path='', template="cloud_browser/browser.html"):
+def browser(request, repo_name, revision='latest', path='', template="cloud_browser/browser.html"):
     """View files in a file path.
 
     :param request: The request.
