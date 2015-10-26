@@ -108,4 +108,5 @@ CLOUD_BROWSER_DEFAULT_LIST_LIMIT = 500
 
 CLOUD_BROWSER_DATASTORE = "CVMFilesystem"
 CLOUD_BROWSER_CVMFS_CACHE = os.path.join(BASE_DIR, 'cvmfs_cache')
+CLOUD_BROWSER_CVMFS_REPOSITORY_URL = 'http://cvmfs-stratum-zero.cern.ch/cvmfs/atlas.cern.ch'
 
