@@ -90,9 +90,10 @@ class CVMFilesystemContainer(base.CloudContainer):
             return ((marker is None or
                      os.path.join(path, name).strip(SEP) > marker.strip(SEP)))
 
-        search_path = os.path.join(self.base_path, path)
+        search_path = self.base_path
         dir_names = [dirent.name for dirent in
-                     self.conn.repository.list_directory(search_path)]
+                     self.conn.repository.list_directory(search_path)
+                     if not dirent.is_symlink()]
         objs = [self.obj_cls.from_path(self, os.path.join(search_path, o))
                 for o in dir_names if _filter(o)]
         return objs[:limit]
@@ -121,23 +122,33 @@ class CVMFilesystemConnection(base.CloudConnection):
     #: Container child class.
     cont_cls = CVMFilesystemContainer
 
-    def __init__(self, url, cache_dir):
+    def __init__(self):
         """Initializer."""
         super(CVMFilesystemConnection, self).__init__(None, None)
+        self.repository = None
+        self.revision = None
+
+    def configure(self, url, revision,
+                  cache_dir=settings.CLOUD_BROWSER_CVMFS_CACHE):
         if url not in opened_repositories:
             opened_repositories[url] = Repository(url, cache_dir)
-        self.repository = opened_repositories[url]
+            self.repository = opened_repositories[url]
+        self.revision = revision if revision != 'latest' else None
+        if self.revision:
+            self.repository.switch_revision(revision)
 
     def _get_connection(self):
         """Return native connection object."""
         return object()
 
     @wrap_fs_cont_errors
-    def _get_containers(self):
+    def _get_containers(self, path='/'):
         """Return available containers."""
         # get the list of directories
-        root_list = [dirent.name for dirent in
-                     self.repository.list_directory('') if dirent.is_directory()]
+        path = '/' if not path else path
+        root_list = [os.path.join(path, dirent.name) for dirent in
+                     self.repository.list_directory(path)
+                     if dirent.is_directory() and not dirent.is_symlink()]
         return [self.cont_cls.from_path(self, d) for d in root_list]
 
     @wrap_fs_cont_errors

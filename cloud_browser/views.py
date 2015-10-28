@@ -1,4 +1,5 @@
 """Cloud browser views."""
+import os
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -56,16 +57,16 @@ def _breadcrumbs(path):
 
 
 @settings_view_decorator
-def browser(request, repo_name, revision='latest', path='', template="cloud_browser/browser.html"):
+def browser(request, repo_name, revision='latest', path='', template='cloud_browser/browser.html'):
     """View files in a file path.
 
     :param request: The request.
     :param path: Path to resource, including container as first part of path.
     :param template: Template to render.
     """
-    from itertools import ifilter, islice
 
     # Inputs.
+    path = '/' + path if not os.path.isabs(path) else path
     container_path, object_path = path_parts(path)
     incoming = request.POST or request.GET or {}
 
@@ -81,36 +82,40 @@ def browser(request, repo_name, revision='latest', path='', template="cloud_brow
                     limit_default,
                     limit_test)
 
+    # check the validity of the parameters
+    if repo_name in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
+        domain_pos = repo_name.find('.')
+        domain = repo_name[domain_pos:]
+        url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
+            + repo_name[:domain_pos]
+    else:
+        return Http404('The repository %s is not allowed', repo_name)
+
     # Q1: Get all containers.
     #     We optimize here by not individually looking up containers later,
     #     instead going through this in-memory list.
     # TODO: Should page listed containers with a ``limit`` and ``marker``.
-    conn = get_connection()
-    containers = conn.get_containers()
+    params = {'url': url, 'revision': revision}
+    conn = get_connection(params)
+    if path == '/':
+        containers = [conn.cont_cls.from_path(conn, path)]
+    else:
+        containers = conn.get_containers(container_path)
+    # Q2: Get objects for instant list, plus one to check "next".
+    container = [c for c in containers if c.base_path == path][0]
+    objects = container.get_objects(object_path, marker, limit+1)
+    marker = None
 
-    marker_part = None
-    container = None
-    objects = None
-    if container_path != '':
-        # Find marked container from list.
-        cont_eq = lambda c: c.name == container_path
-        cont_list = list(islice(ifilter(cont_eq, containers), 1))
-        if not cont_list:
-            raise Http404("No container at: %s" % container_path)
-
-        # Q2: Get objects for instant list, plus one to check "next".
-        container = cont_list[0]
-        objects = container.get_objects(object_path, marker, limit+1)
-        marker = None
-
-        # If over limit, strip last item and set marker.
-        if len(objects) == limit + 1:
-            objects = objects[:limit]
-            marker = objects[-1].name
-            marker_part = relpath(marker, object_path)
+    # If over limit, strip last item and set marker.
+    if len(objects) == limit + 1:
+        objects = objects[:limit]
+        marker = objects[-1].name
+        marker_part = relpath(marker, object_path)
 
     return render_to_response(template,
                               {'path': path,
+                               'revision': revision,
+                               'fqrn': repo_name,
                                'marker': marker,
                                'marker_part': marker_part,
                                'limit': limit,
@@ -124,13 +129,22 @@ def browser(request, repo_name, revision='latest', path='', template="cloud_brow
 
 
 @settings_view_decorator
-def document(_, path=''):
+def document(_, repo_name, revision, path):
     """View single document from path.
 
     :param path: Path to resource, including container as first part of path.
     """
     container_path, object_path = path_parts(path)
-    conn = get_connection()
+    # check the validity of the parameters
+    if repo_name in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
+        domain_pos = repo_name.find('.')
+        domain = repo_name[domain_pos:]
+        url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
+              + repo_name[:domain_pos]
+    else:
+        return Http404('The repository %s is not allowed', repo_name)
+    params = {'url': url, 'revision': revision}
+    conn = get_connection(params)
     try:
         container = conn.get_container(container_path)
     except errors.NoContainerException:
