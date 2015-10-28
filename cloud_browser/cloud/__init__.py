@@ -6,13 +6,13 @@ support any interface, file, memory, cloud, etc. But, as this is called a
 """
 
 
-def get_connection():
+def get_connection(params):
     """Return global connection object.
 
     :rtype: :class:`cloud_browser.cloud.base.CloudConnection`
     """
     from cloud_browser.cloud.config import Config
-    return Config.get_connection()
+    return Config.get_connection(params)
 
 
 def get_connection_cls():

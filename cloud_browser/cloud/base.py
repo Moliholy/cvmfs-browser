@@ -163,12 +163,12 @@ class CloudConnection(object):
         """Return native connection object."""
         raise NotImplementedError
 
-    def get_containers(self):
+    def get_containers(self, path):
         """Return available containers."""
         permitted = lambda c: settings.container_permitted(c.name)
-        return [c for c in self._get_containers() if permitted(c)]
+        return [c for c in self._get_containers(path) if permitted(c)]
 
-    def _get_containers(self):
+    def _get_containers(self, path):
         """Return available containers."""
         raise NotImplementedError
 
