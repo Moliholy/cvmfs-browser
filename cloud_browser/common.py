@@ -3,6 +3,7 @@
 Because cloud operations are OS agnostic, we don't use any of :mod:`os` or
 :mod:`os.path`.
 """
+import os
 from datetime import datetime
 from django.core.exceptions import ImproperlyConfigured
 
@@ -151,16 +152,12 @@ def path_parts(path):
     :return: Container, storage object tuple.
     :rtype:  `tuple` of `string`, `string`
     """
-    path = path if path is not None else ''
-    container_path = object_path = ''
-    parts = path_list(path)
-
-    if len(parts) > 0:
-        container_path = parts[0]
-    if len(parts) > 1:
-        object_path = path_join(*parts[1:])
-
-    return container_path, object_path
+    path = path if path is not None else '/'
+    path = path if os.path.isabs(path) else SEP + path
+    pos = path.rfind('/')
+    if pos == 0:
+        return '/', path[pos:]
+    return path[:pos], path[pos+1:]
 
 
 def path_yield(path):
