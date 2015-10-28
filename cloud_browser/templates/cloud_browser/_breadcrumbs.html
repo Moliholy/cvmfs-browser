@@ -4,6 +4,15 @@
 ###############################################################################
 {% endcomment %}
 
+<script language="javascript">
+    function submitForm(tag) {
+        var url = String(window.location),
+            parts = url.split("/");
+        parts[6] = tag;
+        window.location = parts.join("/");
+    }
+</script>
+
 {% block cloud_browser_breadcrumbs %}
   ( <a class="cloud-browser-breadcrumb-link"
        href="{% url "cloud_browser_browser" fqrn revision '' %}">Home</a> )
@@ -11,4 +20,15 @@
     &raquo; <a class="cloud-browser-breadcrumb-link"
      href="{% url "cloud_browser_browser" fqrn revision crumb_path %}">{{ crumb }}</a>
   {% endfor %}
+{% endblock %}
+
+
+{% block cloud_browser_revision %}
+       <div align="right">
+           <form onsubmit="submitForm(document.getElementById('revision_id').value); return false;">
+               Revision: <input id="revision_id" type="text"
+                      name="revision" placeholder="{{ revision }}" maxlength="6">
+               <input type="submit" value="Change">
+           </form>
+       </div>
 {% endblock %}
