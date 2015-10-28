@@ -61,6 +61,12 @@ def cloud_browser_media_url(_, token):
     return MediaUrlNode(rel_path)
 
 
+@register.filter
+@stringfilter
+def get_file_name(string):
+    return string.split('/')[-1]
+
+
 class MediaUrlNode(Node):
     """Media URL node."""
 

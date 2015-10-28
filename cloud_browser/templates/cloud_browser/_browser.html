@@ -9,15 +9,14 @@
 {% block cloud_browser_content %}
 <div id="cloud-browser-all" class="cloud-browser-defaults">
 <div id="cloud-browser-containers">
-<h2>Containers</h2>
 <ul>
 {% for cont in containers %}
   {% if cont == container %}
-  <li class="cb-selected">{{ cont.name|truncatechars:22 }}</li>
+  <li class="cb-selected">{{ cont.name|get_file_name|truncatechars:22 }}</li>
   {% else %}
   <li>
-    <a href="{% url "cloud_browser_browser" cont.name|urlencode %}"
-       title="{{ cont.name }}">{{ cont.name|truncatechars:22 }}</a>
+    <a href="{% url "cloud_browser_browser" fqrn revision cont.name %}"
+       title="{{ cont.name }}">{{ cont.name|get_file_name|truncatechars:22 }}</a>
   </li>
   {% endif %}
 {% endfor %}
@@ -25,7 +24,6 @@
 </div>
 
 <div id="cloud-browser-objects">
-<h2>Objects</h2>
 {% if objects %}
 <table id="cloud-browser-objects-table">
   <thead>
@@ -47,10 +45,10 @@
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/mimetypes/text-x-generic.png' %}" /></td>
         {% endif %}
         {% if obj.is_file %}
-        <td><a href="{% url "cloud_browser_document" obj.path|urlencode %}"
+        <td><a href="{% url "cloud_browser_document" fqrn revision obj.path %}"
             >{{ obj.basename }}</a></td>
         {% else %}
-        <td><a href="{% url "cloud_browser_browser" obj.path|urlencode %}"
+        <td><a href="{% url "cloud_browser_browser" fqrn revision obj.path %}"
                class="cloud-browser-document-link"
             >{{ obj.basename }}</a></td>
         {% endif %}
@@ -82,7 +80,7 @@
       <td colspan="6">
         {% if marker_part %}
         <form id="cloud-browser-next" class="cloud-browser-form"
-          action="{% url "cloud_browser_browser" path|urlencode %}" method="post">
+          action="{% url "cloud_browser_browser" fqrn revision path %}" method="post">
           {% csrf_token %}
           Next
           <input name="limit" type="text" size="5"
@@ -107,12 +105,11 @@
 {% else %}
     {% if container %}
         <div class="cloud-browser-empty" colspan="6">
-            No objects found in &ldquo;{{ path }}.&rdquo;
+            No elements found in &ldquo;{{ path }}.&rdquo;
         </div>
     {% else %}
         <div class="cloud-browser-empty" colspan="6">
-            No container selected. Please click on a container to list
-            object contents.
+            No directory selected. Please click on a directory.
         </div>
     {% endif %}
 {% endif %}
