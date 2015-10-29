@@ -93,17 +93,12 @@ class CVMFilesystemContainer(base.CloudContainer):
     def get_objects(self, path, marker=None,
                     limit=settings.CLOUD_BROWSER_DEFAULT_LIST_LIMIT):
         """Get objects."""
-        def _filter(name):
-            """Filter."""
-            return ((marker is None or
-                     os.path.join(path, name).strip(SEP) > marker.strip(SEP)))
-
         search_path = self.base_path
         dir_names = [dirent.name for dirent in
                      self.conn.repository.list_directory(search_path)
                      if not dirent.is_symlink()]
         objs = [self.obj_cls.from_path(self, os.path.join(search_path, o))
-                for o in dir_names if _filter(o)]
+                for o in dir_names]
         return objs[:limit]
 
     @wrap_fs_obj_errors
