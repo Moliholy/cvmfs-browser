@@ -32,7 +32,7 @@
       <th>Name</th>
       <th>Content Type</th>
       <th>Content Hash</th>
-      <th>Size (Bytes)</th>
+      <th>Size</th>
       <th>Last Modified</th>
     </tr>
   </thead>
@@ -60,6 +60,9 @@
         <td>
             {% if obj.content_hash %}
             {{ obj.content_hash }}
+                {% if obj.content_hash_type %}
+                - {{ obj.content_hash_type }}
+                {% endif %}
             {% else %}--{% endif %}
         </td>
         <td>
@@ -101,16 +104,20 @@
     <!-- NEW ADDITION: TAGS -->
     {% if tag_list %}
     <div id="cloud-browser-cvmfs-tags">
-    <ul>
+        <table id="cloud-browser-cvmfs-tags-table">
         {% for tag in tag_list %}
-        <li>
-            <a href="{% url "cloud_browser_browser" fqrn tag.revision container.name %}">
-            {{ tag.name|truncatechars:30 }}
-            </a>
-
-        </li>
+            <tr>
+                <td>
+                    <img src="{% cloud_browser_media_url 'img/custom/blue_tag.ico' %}" />
+                </td>
+                <td>
+                    <a href="{% url "cloud_browser_browser" fqrn tag.revision container.name %}">
+                    {{ tag.name|truncatechars:30 }}
+                    </a>
+                </td>
+            </tr>
         {% endfor %}
-    </ul>
+        </table>
     {% endif %}
     </div>
 
