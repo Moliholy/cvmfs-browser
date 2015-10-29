@@ -56,11 +56,14 @@ class CVMFilesystemObject(base.CloudObject):
     @classmethod
     def from_path(cls, container, path):
         """Create object from path."""
+        from datetime import datetime
+
         if not path.startswith(container.base_path):
             path = os.path.join(container.base_path, path)
         dirent = container.conn.repository.lookup(path)
         obj_type = cls.type_cls.SUBDIR if dirent.is_directory() \
             else cls.type_cls.FILE
+        formatted_date = datetime.fromtimestamp(dirent.mtime)
 
         return cls(container,
                    name=dirent.name,
@@ -68,7 +71,7 @@ class CVMFilesystemObject(base.CloudObject):
                    full_path=path,
                    content_hash=dirent.content_hash,
                    content_type=None,
-                   last_modified=dirent.mtime,
+                   last_modified=formatted_date,
                    obj_type=obj_type)
 
 
