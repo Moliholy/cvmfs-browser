@@ -95,16 +95,19 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
     #     We optimize here by not individually looking up containers later,
     #     instead going through this in-memory list.
     # TODO: Should page listed containers with a ``limit`` and ``marker``.
-    params = {'url': url, 'revision': revision}
-    conn = get_connection(params)
-    if path == '/':
-        containers = [conn.cont_cls.from_path(conn, path)]
-    else:
-        containers = conn.get_containers(container_path)
-    # Q2: Get objects for instant list, plus one to check "next".
-    container = [c for c in containers if c.base_path == path][0]
-    objects = container.get_objects(object_path, marker, limit+1)
-    marker = None
+    try:
+        params = {'url': url, 'revision': revision}
+        conn = get_connection(params)
+        if path == '/':
+            containers = [conn.cont_cls.from_path(conn, path)]
+        else:
+            containers = conn.get_containers(container_path)
+        # Q2: Get objects for instant list, plus one to check "next".
+        container = [c for c in containers if c.base_path == path][0]
+        objects = container.get_objects(object_path, marker, limit+1)
+        marker = None
+    except Exception:
+        raise Http404("Revision or folder not found")
 
     # If over limit, strip last item and set marker.
     if len(objects) == limit + 1:
