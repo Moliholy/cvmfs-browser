@@ -136,8 +136,9 @@ class CVMFilesystemConnection(base.CloudConnection):
         if url not in opened_repositories:
             opened_repositories[url] = Repository(url, cache_dir)
             self.repository = opened_repositories[url]
-        self.revision = revision if revision != 'latest' else None
-        if self.revision:
+        self.revision = revision \
+            if revision != 'latest' else self.repository.manifest.revision
+        if revision != 'latest':
             self.repository.switch_revision(revision)
 
     def _get_connection(self):
