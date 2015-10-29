@@ -141,6 +141,11 @@ class CVMFilesystemConnection(base.CloudConnection):
         if revision != 'latest':
             self.repository.switch_revision(revision)
 
+    def get_tag_list(self):
+        history = self.repository.retrieve_history()
+        if history:
+            return history.list_tags()
+
     def _get_connection(self):
         """Return native connection object."""
         return object()
