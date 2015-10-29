@@ -30,7 +30,7 @@ div#cloud-browser-containers {
     float: left;
     margin-right: 5px;
     border: solid 1px #fff;
-    width: 15%;
+    width: 13%;
 }
 div#cloud-browser-containers ul {
     list-style-image: url(../img/tango/16x16/places/folder.png);
@@ -55,7 +55,7 @@ div#cloud-browser-containers li.cb-selected {
 /** CVMFS */
 div#cloud-browser-cvmfs-tags {
     float: right;
-    width: 20%;
+    width: 15%;
     margin-right: 5px;
     border: solid 1px #fff;
 }
@@ -68,11 +68,10 @@ div#cloud-browser-cvmfs-tags ul {
 div#cloud-browser-objects {
     float: left;
     border: solid 1px #fff;
-    width: 60%;
+    width: 70%;
 }
 table#cloud-browser-objects-table {
-    margin: auto;
-    width: 99%;
+    width: 100%;
     font-size: 1em;
 }
 table#cloud-browser-objects-table thead,

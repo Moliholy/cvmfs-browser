@@ -31,8 +31,9 @@
       <th style="width: 16px;">&nbsp;</th>
       <th>Name</th>
       <th>Content Type</th>
+      <th>Content Hash</th>
       <th>Size (Bytes)</th>
-      <th>Date</th>
+      <th>Last Modified</th>
     </tr>
   </thead>
   <tbody>
@@ -54,6 +55,11 @@
         <td>
             {% if obj.smart_content_type %}
                 {{ obj.smart_content_type }}
+            {% else %}--{% endif %}
+        </td>
+        <td>
+            {% if obj.content_hash %}
+            {{ obj.content_hash }}
             {% else %}--{% endif %}
         </td>
         <td>
