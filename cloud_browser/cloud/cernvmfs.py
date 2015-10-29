@@ -8,6 +8,7 @@ from cloud_browser.cloud import errors, base
 from cloud_browser.common import SEP
 
 from cvmfs import Repository
+from cvmfs.dirent import ContentHashTypes
 
 
 ###############################################################################
@@ -32,9 +33,11 @@ wrap_fs_obj_errors = CVMFilesystemObjectWrapper()  # pylint: disable=C0103
 class CVMFilesystemObject(base.CloudObject):
     """CVMFilesystem object wrapper."""
 
-    def __init__(self, container, name, full_path, content_hash, size, **kwargs):
+    def __init__(self, container, name, full_path, content_hash,
+                 content_hash_type, size, **kwargs):
         super(CVMFilesystemObject, self).__init__(container, name, **kwargs)
         self.content_hash = content_hash
+        self.content_hash_type = content_hash_type
         self.size = size
         self.full_path = full_path
 
@@ -64,12 +67,14 @@ class CVMFilesystemObject(base.CloudObject):
         obj_type = cls.type_cls.SUBDIR if dirent.is_directory() \
             else cls.type_cls.FILE
         formatted_date = datetime.fromtimestamp(dirent.mtime)
+        hash_type = ContentHashTypes.to_string(dirent.content_hash_type)
 
         return cls(container,
                    name=dirent.name,
                    size=dirent.size,
                    full_path=path,
                    content_hash=dirent.content_hash,
+                   content_hash_type=hash_type,
                    content_type=None,
                    last_modified=formatted_date,
                    obj_type=obj_type)
