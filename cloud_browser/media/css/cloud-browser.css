@@ -22,14 +22,15 @@ div#cloud-browser-breadcrumbs a:hover {
 /** Containers */
 div#cloud-browser-containers h2,
 div #cloud-browser-objects h2 {
+    float: left;
     font-size: 1.35em;
     text-align: center;
 }
 div#cloud-browser-containers {
     float: left;
-    width: 195px;
     margin-right: 5px;
     border: solid 1px #fff;
+    width: 15%;
 }
 div#cloud-browser-containers ul {
     list-style-image: url(../img/tango/16x16/places/folder.png);
@@ -51,11 +52,23 @@ div#cloud-browser-containers li.cb-selected {
     list-style-image: url(../img/tango/16x16/status/folder-visiting.png);
 }
 
+/** CVMFS */
+div#cloud-browser-cvmfs-tags {
+    float: right;
+    width: 20%;
+    margin-right: 5px;
+    border: solid 1px #fff;
+}
+
+div#cloud-browser-cvmfs-tags ul {
+    list-style-image: url(../img/custom/blue_tag.ico);
+}
+
 /** Objects */
 div#cloud-browser-objects {
+    float: left;
     border: solid 1px #fff;
-    margin-left: 200px;
-    width: auto;
+    width: 60%;
 }
 table#cloud-browser-objects-table {
     margin: auto;
