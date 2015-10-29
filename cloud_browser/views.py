@@ -115,6 +115,8 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
     return render_to_response(template,
                               {'path': path,
                                'revision': revision,
+                               'revision_number': conn.revision,
+                               'tag_list': conn.get_tag_list(),
                                'fqrn': repo_name,
                                'marker': marker,
                                'marker_part': marker_part,
