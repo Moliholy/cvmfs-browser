@@ -40,6 +40,8 @@ class CVMFilesystemObject(base.CloudObject):
         self.content_hash_type = content_hash_type
         self.size = size
         self.full_path = full_path
+        self.is_nested_catalog_mountpoint = kwargs['is_nested_catalog_mountpoint'] \
+            if 'is_nested_catalog_mountpoint' in kwargs else False
 
     def _get_object(self):
         """Return native storage object."""
@@ -73,7 +75,8 @@ class CVMFilesystemObject(base.CloudObject):
                    content_hash_type=hash_type,
                    content_type=None,
                    last_modified=formatted_date,
-                   obj_type=obj_type)
+                   obj_type=obj_type,
+                   is_nested_catalog_mountpoint=dirent.is_nested_catalog_mountpoint())
 
     @classmethod
     def from_path(cls, container, path):

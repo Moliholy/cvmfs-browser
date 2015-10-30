@@ -40,7 +40,11 @@
     {% for obj in objects %}
       <tr>
         {% if obj.is_subdir %}
+          {% if obj.is_nested_catalog_mountpoint %}
+            <td><img src="{% cloud_browser_media_url 'img/tango/16x16/places/folder-saved-search.png' %}" /></td>
+          {% else %}
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/places/folder.png' %}" /></td>
+          {% endif %}
         {% else %}
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/mimetypes/text-x-generic.png' %}" /></td>
         {% endif %}
