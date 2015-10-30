@@ -15,7 +15,7 @@
   <li class="cb-selected">{{ cont.name|get_file_name|truncatechars:22 }}</li>
   {% else %}
   <li>
-    <a href="{% url "cloud_browser_browser" fqrn revision cont.name|urlencode %}"
+    <a href="{% url 'cloud_browser_browser' fqrn revision cont.name|urlencode %}"
        title="{{ cont.name }}">{{ cont.name|get_file_name|truncatechars:22 }}</a>
   </li>
   {% endif %}
@@ -45,10 +45,10 @@
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/mimetypes/text-x-generic.png' %}" /></td>
         {% endif %}
         {% if obj.is_file %}
-        <td><a href="{% url "cloud_browser_document" fqrn revision obj.path|urlencode %}"
+        <td><a href="{% url 'cloud_browser_document' fqrn revision obj.path|urlencode %}"
             >{{ obj.basename }}</a></td>
         {% else %}
-        <td><a href="{% url "cloud_browser_browser" fqrn revision obj.path|urlencode %}"
+        <td><a href="{% url 'cloud_browser_browser' fqrn revision obj.path|urlencode %}"
                class="cloud-browser-document-link"
             >{{ obj.basename }}</a></td>
         {% endif %}
@@ -82,7 +82,7 @@
     <tr>
         <td colspan="6">
             {% if revision_number %}
-            Revision {{ revision_number }}
+            <center>Revision {{ revision_number }}</center>
             {% endif %}
         </td>
     </tr>
@@ -104,14 +104,14 @@
     <!-- NEW ADDITION: TAGS -->
     {% if tag_list %}
     <div id="cloud-browser-cvmfs-tags">
-        <table id="cloud-browser-cvmfs-tags-table">
+        <table class="cloud-browser-cvmfs-table">
         {% for tag in tag_list %}
             <tr>
                 <td>
                     <img src="{% cloud_browser_media_url 'img/custom/blue_tag.ico' %}" />
                 </td>
                 <td>
-                    <a href="{% url "cloud_browser_browser" fqrn tag.revision container.name %}">
+                    <a href="{% url 'cloud_browser_browser' fqrn tag.revision container.name %}">
                     {{ tag.name|truncatechars:30 }}
                     </a>
                 </td>
@@ -122,10 +122,10 @@
         <tfoot>
             <tr>
                 <td colspan="3">
-                    <a href="{% url "cloud_browser_browser" fqrn revision container.name %}?page={{ page|decrement_page }}"> < </a>
+                    <a href="{% url 'cloud_browser_browser' fqrn revision container.name %}?page={{ page|decrement_page }}"> < </a>
                 </td>
                 <td colspan="3">
-                    <a href="{% url "cloud_browser_browser" fqrn revision container.name%}?page={{ page|increment_page }}"> > </a>
+                    <a href="{% url 'cloud_browser_browser' fqrn revision container.name%}?page={{ page|increment_page }}"> > </a>
                 </td>
             </tr>
         </tfoot>
@@ -133,6 +133,18 @@
         &nbsp;
         {% endif %}
         </table>
+    {% endif %}
+    {% if statistics %}
+    <table id="cloud-browser-cvmfs-statistics-table" class="cloud-browser-cvmfs-table">
+        <tr><td>Regular files</td><td>{{ statistics.0 }}</td></tr>
+        <tr><td>Directories</td><td>{{ statistics.1 }}</td></tr>
+        <tr><td>Symlinks</td><td>{{ statistics.2 }}</td></tr>
+        <tr><td>Total file size</td><td>{{ statistics.3 }} B</td></tr>
+        <tr><td>Chunked files</td><td>{{ statistics.4 }}</td></tr>
+        <tr><td>Chunked file size</td><td>{{ statistics.5 }} B</td></tr>
+        <tr><td>Number of chunks</td><td>{{ statistics.6 }}</td></tr>
+        <tr><td>Nested catalogs</td><td>{{ statistics.7 }}</td></tr>
+    </table>
     {% endif %}
     </div>
 
