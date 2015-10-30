@@ -15,7 +15,7 @@
   <li class="cb-selected">{{ cont.name|get_file_name|truncatechars:22 }}</li>
   {% else %}
   <li>
-    <a href="{% url 'cloud_browser_browser' fqrn revision cont.name|urlencode %}"
+    <a href="{% url 'cloud_browser_browser' fqrn revision cont.name %}"
        title="{{ cont.name }}">{{ cont.name|get_file_name|truncatechars:22 }}</a>
   </li>
   {% endif %}
@@ -49,10 +49,10 @@
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/mimetypes/text-x-generic.png' %}" /></td>
         {% endif %}
         {% if obj.is_file %}
-        <td><a href="{% url 'cloud_browser_document' fqrn revision obj.path|urlencode %}"
+        <td><a href="{% url 'cloud_browser_document' fqrn revision obj.path %}"
             >{{ obj.basename }}</a></td>
         {% else %}
-        <td><a href="{% url 'cloud_browser_browser' fqrn revision obj.path|urlencode %}"
+        <td><a href="{% url 'cloud_browser_browser' fqrn revision obj.path %}"
                class="cloud-browser-document-link"
             >{{ obj.basename }}</a></td>
         {% endif %}
