@@ -126,10 +126,10 @@
         <tfoot>
             <tr>
                 <td colspan="3">
-                    <a href="{% url 'cloud_browser_browser' fqrn revision container.name %}?page={{ page|decrement_page }}"> < </a>
+                    <a href="{% url 'cloud_browser_browser' fqrn revision container.name %}?page={{ page|decrement_page }}"> << </a>
                 </td>
                 <td colspan="3">
-                    <a href="{% url 'cloud_browser_browser' fqrn revision container.name%}?page={{ page|increment_page }}"> > </a>
+                    <a href="{% url 'cloud_browser_browser' fqrn revision container.name%}?page={{ page|increment_page }}"> >> </a>
                 </td>
             </tr>
         </tfoot>
