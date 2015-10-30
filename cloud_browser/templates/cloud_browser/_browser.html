@@ -143,9 +143,9 @@
         <tr><td>Regular files</td><td>{{ statistics.0 }}</td></tr>
         <tr><td>Directories</td><td>{{ statistics.1 }}</td></tr>
         <tr><td>Symlinks</td><td>{{ statistics.2 }}</td></tr>
-        <tr><td>Total file size</td><td>{{ statistics.3 }} B</td></tr>
+        <tr><td>Total file size</td><td>{{ statistics.3|filesizeformat }}</td></tr>
         <tr><td>Chunked files</td><td>{{ statistics.4 }}</td></tr>
-        <tr><td>Chunked file size</td><td>{{ statistics.5 }} B</td></tr>
+        <tr><td>Chunked file size</td><td>{{ statistics.5|filesizeformat }}</td></tr>
         <tr><td>Number of chunks</td><td>{{ statistics.6 }}</td></tr>
         <tr><td>Nested catalogs</td><td>{{ statistics.7 }}</td></tr>
     </table>
