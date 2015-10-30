@@ -126,6 +126,10 @@ class CVMFilesystemContainer(base.CloudContainer):
         """Get single object."""
         return self.obj_cls.from_path(self, path)
 
+    def get_closest_catalog_path(self):
+        return self.conn.repository  \
+            .retrieve_catalog_for_path(self.base_path).root_prefix
+
     @property
     def base_path(self):
         """Base absolute path of container."""

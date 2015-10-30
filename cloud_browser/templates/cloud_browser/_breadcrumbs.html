@@ -15,10 +15,16 @@
 
 {% block cloud_browser_breadcrumbs %}
   ( <a class="cloud-browser-breadcrumb-link"
-       href="{% url "cloud_browser_browser" fqrn revision '' %}">Home</a> )
+       href="{% url 'cloud_browser_browser' fqrn revision '' %}">Home</a> )
   {% for crumb_path, crumb in breadcrumbs %}
     &raquo; <a class="cloud-browser-breadcrumb-link"
-     href="{% url "cloud_browser_browser" fqrn revision crumb_path %}">{{ crumb }}</a>
+     href="{% url 'cloud_browser_browser' fqrn revision crumb_path %}">
+                {% if crumb_path == closest_catalog_path %}
+                    <strong>{{ crumb }}</strong>
+                {% else %}
+                    {{ crumb }}
+                {% endif %}
+            </a>
   {% endfor %}
 {% endblock %}
 

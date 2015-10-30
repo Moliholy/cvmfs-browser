@@ -107,6 +107,7 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
         end_page -= limit
     tag_list = tag_list[init_page:end_page]
     statistics = conn.get_statistics()
+    closest_catalog_path = container.get_closest_catalog_path()[1:]
 
     return render_to_response(template,
                               {'path': path,
@@ -114,6 +115,7 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
                                'revision_number': conn.revision,
                                'tag_list': tag_list,
                                'fqrn': repo_name,
+                               'closest_catalog_path': closest_catalog_path,
                                'breadcrumbs': _breadcrumbs(path),
                                'page': page,
                                'statistics': statistics,
