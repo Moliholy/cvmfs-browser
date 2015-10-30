@@ -57,6 +57,25 @@ class CVMFilesystemObject(base.CloudObject):
         return self.full_path
 
     @classmethod
+    def from_dirent(cls, container, dirent):
+        from datetime import datetime
+
+        obj_type = cls.type_cls.SUBDIR if dirent.is_directory() \
+            else cls.type_cls.FILE
+        formatted_date = datetime.fromtimestamp(dirent.mtime)
+        hash_type = ContentHashTypes.to_string(dirent.content_hash_type)
+
+        return cls(container,
+                   name=dirent.name,
+                   size=dirent.size,
+                   full_path=SEP.join([container.base_path, dirent.name]),
+                   content_hash=dirent.content_hash,
+                   content_hash_type=hash_type,
+                   content_type=None,
+                   last_modified=formatted_date,
+                   obj_type=obj_type)
+
+    @classmethod
     def from_path(cls, container, path):
         """Create object from path."""
         from datetime import datetime
@@ -94,11 +113,10 @@ class CVMFilesystemContainer(base.CloudContainer):
                     limit=settings.CLOUD_BROWSER_DEFAULT_LIST_LIMIT):
         """Get objects."""
         search_path = self.base_path
-        dir_names = [dirent.name for dirent in
-                     self.conn.repository.list_directory(search_path)
-                     if not dirent.is_symlink()]
-        objs = [self.obj_cls.from_path(self, os.path.join(search_path, o))
-                for o in dir_names]
+        dirents = [dirent for dirent in
+                   self.conn.repository.list_directory(search_path)
+                   if not dirent.is_symlink()]
+        objs = [self.obj_cls.from_dirent(self, o) for o in dirents]
         return objs[:limit]
 
     @wrap_fs_obj_errors
