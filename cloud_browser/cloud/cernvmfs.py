@@ -68,7 +68,7 @@ class CVMFilesystemObject(base.CloudObject):
         return cls(container,
                    name=dirent.name,
                    size=dirent.size,
-                   full_path=SEP.join([container.base_path, dirent.name]),
+                   full_path=os.path.join(container.base_path, dirent.name),
                    content_hash=dirent.content_hash,
                    content_hash_type=hash_type,
                    content_type=None,
@@ -109,15 +109,14 @@ class CVMFilesystemContainer(base.CloudContainer):
         return object()
 
     @wrap_fs_obj_errors
-    def get_objects(self, path, marker=None,
-                    limit=settings.CLOUD_BROWSER_DEFAULT_LIST_LIMIT):
+    def get_objects(self, path, marker=None, limit=1000000):
         """Get objects."""
         search_path = self.base_path
         dirents = [dirent for dirent in
                    self.conn.repository.list_directory(search_path)
                    if not dirent.is_symlink()]
         objs = [self.obj_cls.from_dirent(self, o) for o in dirents]
-        return objs[:limit]
+        return objs
 
     @wrap_fs_obj_errors
     def get_object(self, path):
