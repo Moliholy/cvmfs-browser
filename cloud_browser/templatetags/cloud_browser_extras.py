@@ -41,6 +41,26 @@ def truncatechars(value, num, end_text="..."):
 truncatechars.is_safe = True  # pylint: disable=W0612
 
 
+@register.filter
+@stringfilter
+def increment_page(current_page):
+    page_int = int(current_page) + 1
+    return str(page_int)
+
+
+@register.filter
+@stringfilter
+def decrement_page(current_page):
+    page_int = int(current_page) - 1
+    return str(page_int) if page_int >= 0 else '0'
+
+
+@register.filter
+@stringfilter
+def make_page_parameter(page):
+    return '?page=' + page
+
+
 @register.tag
 def cloud_browser_media_url(_, token):
     """Get base media URL for application static media.

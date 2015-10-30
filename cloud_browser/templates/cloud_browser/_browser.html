@@ -80,11 +80,11 @@
   </tbody>
   <tfoot>
     <tr>
-      <td colspan="6">
-        {% if revision_number %}
-            <strong><center>Revision {{ revision_number }}</center></strong>
-        {% endif %}
-      </td>
+        <td colspan="6">
+            {% if revision_number %}
+            Revision {{ revision_number }}
+            {% endif %}
+        </td>
     </tr>
   </tfoot>
 </table>
@@ -117,6 +117,21 @@
                 </td>
             </tr>
         {% endfor %}
+
+        {% if page %}
+        <tfoot>
+            <tr>
+                <td colspan="3">
+                    <a href="{% url "cloud_browser_browser" fqrn revision container.name %}?page={{ page|decrement_page }}"> < </a>
+                </td>
+                <td colspan="3">
+                    <a href="{% url "cloud_browser_browser" fqrn revision container.name%}?page={{ page|increment_page }}"> > </a>
+                </td>
+            </tr>
+        </tfoot>
+        {% else %}
+        &nbsp;
+        {% endif %}
         </table>
     {% endif %}
     </div>

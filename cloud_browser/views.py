@@ -69,18 +69,7 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
     path = '/' + path if not os.path.isabs(path) else path
     container_path, object_path = path_parts(path)
     incoming = request.POST or request.GET or {}
-
-    marker = incoming.get('marker', None)
-    marker_part = incoming.get('marker_part', None)
-    if marker_part:
-        marker = path_join(object_path, marker_part)
-
-    # Get and adjust listing limit.
-    limit_default = settings.CLOUD_BROWSER_DEFAULT_LIST_LIMIT
-    limit_test = lambda x: x > 0 and (MAX_LIMIT is None or x <= MAX_LIMIT - 1)
-    limit = get_int(incoming.get('limit', limit_default),
-                    limit_default,
-                    limit_test)
+    page = incoming['page'] if 'page' in incoming else '0'
 
     # check the validity of the parameters
     if repo_name in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
@@ -104,27 +93,28 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
             containers = conn.get_containers(container_path)
         # Q2: Get objects for instant list, plus one to check "next".
         container = [c for c in containers if c.base_path == path][0]
-        objects = container.get_objects(object_path, marker, limit+1)
-        marker = None
+        objects = container.get_objects(object_path, None, 1000000)
     except Exception:
         raise Http404("Revision or folder not found")
 
-    # If over limit, strip last item and set marker.
-    if len(objects) == limit + 1:
-        objects = objects[:limit]
-        marker = objects[-1].name
-        marker_part = relpath(marker, object_path)
+    tag_list = conn.get_tag_list()
+    limit = settings.CLOUD_BROWSER_DEFAULT_LIST_LIMIT
+    page_int = int(page)
+    init_page = page_int * limit
+    end_page = ((page_int + 1) * limit)
+    if init_page >= len(tag_list):
+        init_page -= limit
+        end_page -= limit
+    tag_list = tag_list[init_page:end_page]
 
     return render_to_response(template,
                               {'path': path,
                                'revision': revision,
                                'revision_number': conn.revision,
-                               'tag_list': conn.get_tag_list(),
+                               'tag_list': tag_list,
                                'fqrn': repo_name,
-                               'marker': marker,
-                               'marker_part': marker_part,
-                               'limit': limit,
                                'breadcrumbs': _breadcrumbs(path),
+                               'page': page,
                                'container_path': container_path,
                                'containers': containers,
                                'container': container,
