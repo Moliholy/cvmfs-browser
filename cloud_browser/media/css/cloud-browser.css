@@ -60,9 +60,14 @@ div#cloud-browser-cvmfs-tags {
     border: solid 1px #fff;
 }
 
-table#cloud-browser-cvmfs-tags-table {
+.cloud-browser-cvmfs-table {
     font-size: 11px;
 }
+
+table#cloud-browser-cvmfs-statistics-table {
+    margin-top: 20px;
+}
+
 
 /** Objects */
 div#cloud-browser-objects {
