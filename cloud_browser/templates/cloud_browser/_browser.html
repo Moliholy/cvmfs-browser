@@ -63,9 +63,9 @@
         </td>
         <td>
             {% if obj.content_hash %}
-            {{ obj.content_hash }}
-                {% if obj.content_hash_type %}
-                - {{ obj.content_hash_type }}
+            <span style="float: left">{{ obj.content_hash }}
+                {% if obj.content_hash_type %}</span>
+                <span style="float: right; margin-right: 15px;">{{ obj.content_hash_type }}</span>
                 {% endif %}
             {% else %}--{% endif %}
         </td>
