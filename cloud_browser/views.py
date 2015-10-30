@@ -106,6 +106,7 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
         init_page -= limit
         end_page -= limit
     tag_list = tag_list[init_page:end_page]
+    statistics = conn.get_statistics()
 
     return render_to_response(template,
                               {'path': path,
@@ -115,6 +116,7 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
                                'fqrn': repo_name,
                                'breadcrumbs': _breadcrumbs(path),
                                'page': page,
+                               'statistics': statistics,
                                'container_path': container_path,
                                'containers': containers,
                                'container': container,

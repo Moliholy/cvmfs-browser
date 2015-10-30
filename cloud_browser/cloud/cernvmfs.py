@@ -167,6 +167,10 @@ class CVMFilesystemConnection(base.CloudConnection):
         """Return native connection object."""
         return object()
 
+    def get_statistics(self):
+        return self.repository.retrieve_root_catalog() \
+            .get_statistics().get_all_fields()
+
     @wrap_fs_cont_errors
     def _get_containers(self, path='/'):
         """Return available containers."""
