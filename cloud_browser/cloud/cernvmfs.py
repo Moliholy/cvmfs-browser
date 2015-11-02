@@ -155,20 +155,29 @@ class CVMFilesystemConnection(base.CloudConnection):
         self.repository = None
         self.revision = None
 
-    def configure(self, url, revision,
+    def configure(self, url, revision, timestamp,
                   cache_dir=settings.CLOUD_BROWSER_CVMFS_CACHE):
         if url not in opened_repositories:
             opened_repositories[url] = Repository(url, cache_dir)
             self.repository = opened_repositories[url]
-        self.revision = revision \
-            if revision != 'latest' else self.repository.manifest.revision
-        if revision != 'latest':
-            self.repository.switch_revision(revision)
+        if timestamp:
+            history = self.repository.retrieve_history()
+            self.revision = history.get_tag_by_date(timestamp).revision
+        else:
+            self.revision = revision \
+                if revision != 'latest' else self.repository.manifest.revision
+            if revision != 'latest':
+                self.repository.switch_revision(self.revision)
 
     def get_tag_list(self):
         history = self.repository.retrieve_history()
         if history:
             return history.list_tags()
+
+    def get_tag_by_revision(self):
+        history = self.repository.retrieve_history()
+        if history:
+            return history.get_tag_by_revision(self.revision)
 
     def _get_connection(self):
         """Return native connection object."""

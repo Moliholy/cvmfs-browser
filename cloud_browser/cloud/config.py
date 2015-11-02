@@ -57,5 +57,6 @@ class Config(object):
             cls.__connection_obj = cls.__connection_fn()
         if params:
             cls.__connection_obj.configure(params['url'],
-                                           params['revision'])
+                                           params['revision'],
+                                           params['date'])
         return cls.__connection_obj
