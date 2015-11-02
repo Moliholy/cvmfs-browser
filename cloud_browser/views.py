@@ -1,6 +1,8 @@
 """Cloud browser views."""
 import os
-from django.http import HttpResponse, Http404
+import time
+import datetime
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.importlib import import_module
@@ -57,7 +59,8 @@ def _breadcrumbs(path):
 
 
 @settings_view_decorator
-def browser(request, repo_name, revision='latest', path='', template='cloud_browser/browser.html'):
+def browser(request, repo_name, revision='latest', path='',
+            template='cloud_browser/browser.html'):
     """View files in a file path.
 
     :param request: The request.
@@ -70,6 +73,15 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
     container_path, object_path = path_parts(path)
     incoming = request.POST or request.GET or {}
     page = incoming['page'] if 'page' in incoming else '0'
+    revision_date_str = incoming['revision_date'] \
+        if 'revision_date' in incoming else None
+
+    revision_tmstamp = None
+    if revision_date_str:
+        revision_tmstamp = int(time.
+                               mktime(datetime.datetime
+                                       .strptime(revision_date_str, "%Y-%m-%d")
+                                       .timetuple()))
 
     # check the validity of the parameters
     if repo_name in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
@@ -83,10 +95,13 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
     # Q1: Get all containers.
     #     We optimize here by not individually looking up containers later,
     #     instead going through this in-memory list.
-    # TODO: Should page listed containers with a ``limit`` and ``marker``.
     try:
-        params = {'url': url, 'revision': revision}
+        params = {'url': url, 'revision': revision, 'date': revision_tmstamp}
         conn = get_connection(params)
+        if revision_tmstamp:
+            new_url = '/'.join(
+                ['/cb/browser', repo_name, str(conn.revision), path])
+            return HttpResponseRedirect(new_url)
         if path == '/':
             containers = [conn.cont_cls.from_path(conn, path)]
         else:
@@ -108,12 +123,15 @@ def browser(request, repo_name, revision='latest', path='', template='cloud_brow
     tag_list = tag_list[init_page:end_page]
     statistics = conn.get_statistics()
     closest_catalog_path = container.get_closest_catalog_path()[1:]
+    current_tag = conn.get_tag_by_revision()
+    revision_date = str(current_tag.timestamp.date())
 
     return render_to_response(template,
                               {'path': path,
                                'revision': revision,
-                               'revision_number': conn.revision,
                                'tag_list': tag_list,
+                               'revision_date': revision_date,
+                               'current_tag': current_tag,
                                'fqrn': repo_name,
                                'closest_catalog_path': closest_catalog_path,
                                'breadcrumbs': _breadcrumbs(path),
