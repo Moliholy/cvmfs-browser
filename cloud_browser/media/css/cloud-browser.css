@@ -19,7 +19,14 @@ div#cloud-browser-breadcrumbs a:hover {
     text-decoration: underline;
 }
 
+div#cloud-browser-revision {
+    margin-bottom: 10px;
+}
+
 /** Containers */
+div#cloud-browser-all {
+    margin-top: 50px;
+}
 div#cloud-browser-containers h2,
 div #cloud-browser-objects h2 {
     float: left;
@@ -64,6 +71,9 @@ div#cloud-browser-cvmfs-tags {
     font-size: 11px;
 }
 
+.field input[type="date"] {
+  height: 20px;
+}
 table#cloud-browser-cvmfs-statistics-table {
     margin-top: 20px;
 }
