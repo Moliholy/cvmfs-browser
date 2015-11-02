@@ -85,8 +85,10 @@
   <tfoot>
     <tr>
         <td colspan="6">
-            {% if revision_number %}
-            <center>Revision {{ revision_number }}</center>
+            {% if current_tag %}
+            <center>
+                Revision {{ current_tag.revision }} - {{ current_tag.name }}
+            </center>
             {% endif %}
         </td>
     </tr>

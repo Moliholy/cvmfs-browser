@@ -5,36 +5,57 @@
 {% endcomment %}
 
 <script language="javascript">
-    function submitForm(tag) {
-        var url = String(window.location),
-            parts = url.split("/");
-        parts[6] = tag;
-        window.location = parts.join("/");
+    function submitRevisionNumberForm(revision_number, revision_date) {
+        if (revision_number) {
+            var url = String(window.location),
+                parts = url.split("/");
+            parts[6] = revision_number;
+            window.location = parts.join("/");
+        }
+    }
+
+    function submitRevisionDateForm(revision_date) {
+        if(revision_date) {
+            var url = String(window.location);
+            window.location = url + "?revision_date=" + revision_date;
+        }
     }
 </script>
 
 {% block cloud_browser_breadcrumbs %}
-  ( <a class="cloud-browser-breadcrumb-link"
-       href="{% url 'cloud_browser_browser' fqrn revision '' %}">Home</a> )
-  {% for crumb_path, crumb in breadcrumbs %}
-    &raquo; <a class="cloud-browser-breadcrumb-link"
-     href="{% url 'cloud_browser_browser' fqrn revision crumb_path %}">
-                {% if crumb_path == closest_catalog_path %}
-                    <strong>{{ crumb }}</strong>
-                {% else %}
-                    {{ crumb }}
-                {% endif %}
-            </a>
-  {% endfor %}
+( <a class="cloud-browser-breadcrumb-link"
+     href="{% url 'cloud_browser_browser' fqrn revision '' %}">Home</a> )
+{% for crumb_path, crumb in breadcrumbs %}
+&raquo; <a class="cloud-browser-breadcrumb-link"
+           href="{% url 'cloud_browser_browser' fqrn revision crumb_path %}">
+    {% if crumb_path == closest_catalog_path %}
+    <strong>{{ crumb }}</strong>
+    {% else %}
+    {{ crumb }}
+    {% endif %}
+</a>
+{% endfor %}
 {% endblock %}
 
 
 {% block cloud_browser_revision %}
-       <div align="right">
-           <form onsubmit="submitForm(document.getElementById('revision_id').value); return false;">
-               Revision: <input id="revision_id" type="text"
-                      name="revision" placeholder="{{ revision }}" maxlength="6">
-               <input type="submit" value="Change">
-           </form>
-       </div>
+<div id="cloud-browser-revision">
+    <form onsubmit="submitRevisionDateForm(document.getElementById('revision_date').value);
+                                       return false;">
+        <span style="float: left">
+            Date: <input id="revision_date" type="date" value="{{ revision_date }}">
+            <input type="submit" value="Change">
+        </span>
+    </form>
+    <form onsubmit="submitRevisionNumberForm(document.getElementById('revision_id').value);
+                               return false;">
+        <span style="float: right">
+            Number: <input id="revision_id" type="text"
+                                             name="revision number"
+                                             placeholder="{{ revision }}"
+                                             maxlength="6">
+            <input type="submit" value="Change">
+        </span>
+    </form>
+</div>
 {% endblock %}
