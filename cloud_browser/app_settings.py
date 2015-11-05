@@ -162,10 +162,6 @@ class Settings(object):
     """
     #: Valid datastore types.
     DATASTORES = set((
-        'AWS',
-        'Google',
-        'Rackspace',
-        'Filesystem',
         'CVMFilesystem',
     ))
 
@@ -175,7 +171,7 @@ class Settings(object):
     SETTINGS = {
         # Datastore choice.
         'CLOUD_BROWSER_DATASTORE': Setting(
-            default='Filesystem',
+            default='CVMFilesystem',
             valid_set=DATASTORES
         ),
 
