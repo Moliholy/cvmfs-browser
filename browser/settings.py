@@ -179,6 +179,6 @@ CLOUD_BROWSER_CVMFS_URL_MAPPING = {
     '.cern.ch': 'http://cvmfs-stratum-one.cern.ch/opt/',
     '.desy.de': 'http://cvmfs-stratum-one.cern.ch/cvmfs/',
     '.egi.eu': 'http://cvmfs-egi.gridpp.rl.ac.uk:8000/cvmfs/',
-    'amc.nl': 'http://cvmfs01.nikhef.nl/cvmfs/',
+    '.amc.nl': 'http://cvmfs01.nikhef.nl/cvmfs/',
     '.opensciencegrid.org': 'http://cvmfs.racf.bnl.gov/cvmfs/',
 }
