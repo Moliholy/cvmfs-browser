@@ -17,7 +17,7 @@ setup(
                 'a set of CernVM-FS repositories in the browser.',
     long_description=README,
     zip_safe=False,
-    url='http://cernvm.cern.ch/portal/startcvmfs/',
+    url='https://github.com/cvmfs/cvmfs-browser',
     author='Jose Molina Colmenero',
     author_email='jose.molina@cern.ch',
     classifiers=[
