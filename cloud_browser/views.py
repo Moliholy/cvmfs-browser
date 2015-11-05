@@ -9,8 +9,7 @@ from django.utils.importlib import import_module
 
 from cloud_browser.app_settings import settings
 from cloud_browser.cloud import get_connection, get_connection_cls, errors
-from cloud_browser.common import get_int, \
-    path_parts, path_join, path_yield, relpath
+from cloud_browser.common import path_parts, path_join, path_yield
 
 
 MAX_LIMIT = get_connection_cls().cont_cls.max_list
@@ -64,6 +63,8 @@ def browser(request, repo_name, revision='latest', path='',
     """View files in a file path.
 
     :param request: The request.
+    :param repo_name: fully qualified repository name.
+    :param revision: revision number or 'latest'.
     :param path: Path to resource, including container as first part of path.
     :param template: Template to render.
     """
@@ -84,14 +85,14 @@ def browser(request, repo_name, revision='latest', path='',
                                        .timetuple()))
 
     # check the validity of the parameters
-    if repo_name in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
-        domain_pos = repo_name.find('.')
-        domain = repo_name[domain_pos:]
-        url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
-            + repo_name[:domain_pos]
-    else:
+    if settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST and \
+            repo_name not in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
         return Http404('The repository %s is not allowed', repo_name)
 
+    domain_pos = repo_name.find('.')
+    domain = repo_name[domain_pos:]
+    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
+          + repo_name[:domain_pos]
     # Q1: Get all containers.
     #     We optimize here by not individually looking up containers later,
     #     instead going through this in-memory list.
