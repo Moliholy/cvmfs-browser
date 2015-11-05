@@ -11,7 +11,7 @@ def get_connection(params):
 
     :rtype: :class:`cloud_browser.cloud.base.CloudConnection`
     """
-    from cloud_browser.cloud.config import Config
+    from cvmfs_browser.cloud.config import Config
     return Config.get_connection(params)
 
 
@@ -20,5 +20,5 @@ def get_connection_cls():
 
     :rtype: :class:`type`
     """
-    from cloud_browser.cloud.config import Config
+    from cvmfs_browser.cloud.config import Config
     return Config.get_connection_cls()

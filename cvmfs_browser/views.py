@@ -7,9 +7,9 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.importlib import import_module
 
-from cloud_browser.app_settings import settings
-from cloud_browser.cloud import get_connection, get_connection_cls, errors
-from cloud_browser.common import path_parts, path_join, path_yield
+from cvmfs_browser.app_settings import settings
+from cvmfs_browser.cloud import get_connection, get_connection_cls, errors
+from cvmfs_browser.common import path_parts, path_join, path_yield
 
 
 MAX_LIMIT = get_connection_cls().cont_cls.max_list

@@ -9,9 +9,9 @@ for Developers. This abstract base class gets most of the common work done.
 
 .. _boto: http://code.google.com/p/boto/
 """
-from cloud_browser.app_settings import settings
-from cloud_browser.cloud import errors, base
-from cloud_browser.common import SEP, requires, dt_from_header
+from cvmfs_browser.app_settings import settings
+from cvmfs_browser.cloud import errors, base
+from cvmfs_browser.common import SEP, requires, dt_from_header
 
 ###############################################################################
 # Constants / Conditional Imports

@@ -5,7 +5,7 @@ from django import template
 from django.template import TemplateSyntaxError, Node
 from django.template.defaultfilters import stringfilter
 
-from cloud_browser.app_settings import settings
+from cvmfs_browser.app_settings import settings
 
 register = template.Library()  # pylint: disable=C0103
 

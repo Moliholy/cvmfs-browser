@@ -10,14 +10,14 @@ class Config(object):
     @classmethod
     def from_settings(cls):
         """Create configuration from Django settings or environment."""
-        from cloud_browser.app_settings import settings
+        from cvmfs_browser.app_settings import settings
         from django.core.exceptions import ImproperlyConfigured
 
         conn_cls = conn_fn = None
         datastore = settings.CLOUD_BROWSER_DATASTORE
         if datastore == 'CVMFilesystem':
             # Use Cvmfs
-            from cloud_browser.cloud.cernvmfs import CVMFilesystemConnection
+            from cvmfs_browser.cloud.cernvmfs import CVMFilesystemConnection
             conn_cls = CVMFilesystemConnection
             conn_fn = lambda: CVMFilesystemConnection()
 

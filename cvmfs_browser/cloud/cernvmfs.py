@@ -3,9 +3,9 @@ from __future__ import with_statement
 
 import os
 
-from cloud_browser.app_settings import settings
-from cloud_browser.cloud import errors, base
-from cloud_browser.common import SEP
+from cvmfs_browser.app_settings import settings
+from cvmfs_browser.cloud import errors, base
+from cvmfs_browser.common import SEP
 
 from cvmfs import Repository
 from cvmfs.dirent import ContentHashTypes

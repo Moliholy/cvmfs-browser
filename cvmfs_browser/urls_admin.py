@@ -2,7 +2,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic.base import RedirectView
 
-from cloud_browser.app_settings import settings
+from cvmfs_browser.app_settings import settings
 
 # pylint: disable=invalid-name
 urlpatterns = patterns(
