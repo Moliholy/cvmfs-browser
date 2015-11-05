@@ -6,7 +6,7 @@ from cvmfs_browser.app_settings import settings
 
 # pylint: disable=invalid-name
 urlpatterns = patterns(
-    'cloud_browser.views',
+    'cvmfs_browser.views',
     url(r'^browser/(?P<repo_name>[a-z\.\-]+)/$',
         'browser', name="cloud_browser_browser"),
     url(r'^browser/(?P<repo_name>[a-z\.\-]+)/(?P<revision>[^\/]*)/(?P<path>.*)$',
