@@ -35,7 +35,8 @@ setup(
     ],
     package_data={'cvmfs_browser': ['media/**/**/**/**/**',
                                     'media/*/*.js',
-                                    'templates/cloud_browser/**/**']},
+                                    'templates/cloud_browser/admin/*.html',
+                                    'templates/cloud_browser/*.html']},
     data_files=[('', ['README.rst', 'INSTALL', 'COPYING'],)],
     install_requires=[
         'python-cvmfsutils >= 0.1.0',

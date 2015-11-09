@@ -84,11 +84,6 @@ def browser(request, repo_name, revision='latest', path='',
                                        .strptime(revision_date_str, "%Y-%m-%d")
                                        .timetuple()))
 
-    # check the validity of the parameters
-    if settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST and \
-            repo_name not in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
-        return Http404('The repository %s is not allowed', repo_name)
-
     domain_pos = repo_name.find('.')
     domain = repo_name[domain_pos:]
     url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
@@ -153,15 +148,12 @@ def document(_, repo_name, revision, path):
     :param path: Path to resource, including container as first part of path.
     """
     container_path, object_path = path_parts(path)
-    # check the validity of the parameters
-    if repo_name in settings.CLOUD_BROWSER_CVMFS_FQRN_WHITELIST:
-        domain_pos = repo_name.find('.')
-        domain = repo_name[domain_pos:]
-        url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
-              + repo_name[:domain_pos]
-    else:
-        return Http404('The repository %s is not allowed', repo_name)
-    params = {'url': url, 'revision': revision}
+    domain_pos = repo_name.find('.')
+    domain = repo_name[domain_pos:]
+    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
+          + repo_name[:domain_pos]
+
+    params = {'url': url, 'revision': revision, 'date': None}
     conn = get_connection(params)
     try:
         container = conn.get_container(container_path)
