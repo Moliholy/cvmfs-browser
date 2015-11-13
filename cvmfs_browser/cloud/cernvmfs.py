@@ -158,7 +158,7 @@ class CVMFilesystemConnection(base.CloudConnection):
     def configure(self, url, revision, timestamp,
                   cache_dir=settings.CLOUD_BROWSER_CVMFS_CACHE):
         if url not in opened_repositories:
-            opened_repositories[url] = Repository(url, cache_dir)
+            opened_repositories[url] = Repository.from_source(url, cache_dir)
             self.repository = opened_repositories[url]
         if timestamp:
             history = self.repository.retrieve_history()
