@@ -253,21 +253,13 @@ class Settings(object):
 
     @property
     def app_media_url(self):
-        """Get application media root from real media root URL."""
-        url = None
+        """Get application static root from real static root URL."""
+        url = '/static/'
         media_dir = self.CLOUD_BROWSER_STATIC_MEDIA_DIR
         if media_dir:
             url = os.path.join(self.MEDIA_URL, media_dir).rstrip('/') + '/'
 
         return url
-
-    @property
-    def app_media_doc_root(self):  # pylint: disable=R0201
-        """Get application media document (file) root."""
-        app_dir = os.path.abspath(os.path.dirname(__file__))
-        media_root = os.path.join(app_dir, 'media')
-
-        return media_root
 
 
 settings = Settings()  # pylint: disable=C0103

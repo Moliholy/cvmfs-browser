@@ -33,9 +33,9 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content'
     ],
-    package_data={'cvmfs_browser': ['media/**/**/**/**/**',
-                                    'media/js/*.js',
-                                    'media/css/*.css',
+    package_data={'cvmfs_browser': ['static/**/**/**/**/**',
+                                    'static/js/*.js',
+                                    'static/css/*.css',
                                     'templates/cloud_browser/admin/*.html',
                                     'templates/cloud_browser/*.html']},
     data_files=[('', ['README.rst', 'INSTALL', 'COPYING'],)],

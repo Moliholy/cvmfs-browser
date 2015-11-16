@@ -16,12 +16,3 @@ urlpatterns = patterns(
     url(r'^document/(?P<repo_name>[a-z\.\-]+)/(?P<revision>[^\/]*)/(?P<path>.*)$',
         'document', name="cloud_browser_document"),
 )
-
-if settings.app_media_url is None:
-    # Use a static serve.
-    urlpatterns += patterns(
-        '',
-        url(r'^app_media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.app_media_doc_root},
-            name="cloud_browser_media"),
-    )

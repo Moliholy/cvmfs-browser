@@ -63,7 +63,7 @@ def make_page_parameter(page):
 
 @register.tag
 def cloud_browser_media_url(_, token):
-    """Get base media URL for application static media.
+    """Get base static URL for application static static.
 
     Correctly handles whether or not the settings variable
     ``CLOUD_BROWSER_STATIC_MEDIA_DIR`` is set and served.
@@ -90,7 +90,7 @@ def get_file_name(string):
 class MediaUrlNode(Node):
     """Media URL node."""
 
-    #: Static application media URL (or ``None``).
+    #: Static application static URL (or ``None``).
     static_media_url = settings.app_media_url
 
     def __init__(self, rel_path):
