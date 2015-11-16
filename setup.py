@@ -36,6 +36,7 @@ setup(
     package_data={'cvmfs_browser': ['static/**/**/**/**/**',
                                     'static/js/*.js',
                                     'static/css/*.css',
+                                    'static/img/custom/*',
                                     'templates/cloud_browser/admin/*.html',
                                     'templates/cloud_browser/*.html']},
     data_files=[('', ['README.rst', 'INSTALL', 'COPYING'],)],
