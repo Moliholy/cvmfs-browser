@@ -254,12 +254,7 @@ class Settings(object):
     @property
     def app_media_url(self):
         """Get application static root from real static root URL."""
-        url = '/static/'
-        media_dir = self.CLOUD_BROWSER_STATIC_MEDIA_DIR
-        if media_dir:
-            url = os.path.join(self.MEDIA_URL, media_dir).rstrip('/') + '/'
-
-        return url
+        return settings.STATIC_URL
 
 
 settings = Settings()  # pylint: disable=C0103
