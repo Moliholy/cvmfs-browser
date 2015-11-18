@@ -84,10 +84,7 @@ def browser(request, repo_name, revision='latest', path='',
                                        .strptime(revision_date_str, "%Y-%m-%d")
                                        .timetuple()))
 
-    domain_pos = repo_name.find('.')
-    domain = repo_name[domain_pos:]
-    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
-          + repo_name[:domain_pos]
+    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
     # Q1: Get all containers.
     #     We optimize here by not individually looking up containers later,
     #     instead going through this in-memory list.
@@ -148,10 +145,7 @@ def document(_, repo_name, revision, path):
     :param path: Path to resource, including container as first part of path.
     """
     container_path, object_path = path_parts(path)
-    domain_pos = repo_name.find('.')
-    domain = repo_name[domain_pos:]
-    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[domain] \
-          + repo_name[:domain_pos]
+    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
 
     params = {'url': url, 'revision': revision, 'date': None}
     conn = get_connection(params)
