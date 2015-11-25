@@ -92,8 +92,9 @@ def browser(request, repo_name, revision='latest', path='',
         params = {'url': url, 'revision': revision, 'date': revision_tmstamp}
         conn = get_connection(params)
         if revision_tmstamp:
+            pos = request.path[:-1].rfind('/')
             new_url = '/'.join(
-                ['/cb/browser', repo_name, str(conn.revision), path])
+                [request.path[0:pos], str(conn.revision), path])
             return HttpResponseRedirect(new_url)
         if path == '/':
             containers = [conn.cont_cls.from_path(conn, path)]
