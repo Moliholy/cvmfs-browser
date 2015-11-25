@@ -3,6 +3,7 @@ import os
 import time
 import datetime
 import magic
+import urllib
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -71,6 +72,7 @@ def browser(request, repo_name, revision='latest', path='',
     """
 
     # Inputs.
+    path = urllib.unquote(path)
     path = '/' + path if not os.path.isabs(path) else path
     container_path, object_path = path_parts(path)
     incoming = request.POST or request.GET or {}
@@ -143,6 +145,7 @@ def document(_, repo_name, revision, path):
 
     :param path: Path to resource, including container as first part of path.
     """
+    path = urllib.unquote(path)
     container_path, object_path = path_parts(path)
     url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
 
