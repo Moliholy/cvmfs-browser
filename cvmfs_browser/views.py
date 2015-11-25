@@ -78,17 +78,14 @@ def browser(request, repo_name, revision='latest', path='',
         if 'revision_date' in incoming else None
 
     revision_tmstamp = None
-    if revision_date_str:
-        revision_tmstamp = int(time.
-                               mktime(datetime.datetime
-                                       .strptime(revision_date_str, "%Y-%m-%d")
-                                       .timetuple()))
-
-    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
-    # Q1: Get all containers.
-    #     We optimize here by not individually looking up containers later,
-    #     instead going through this in-memory list.
+    
     try:
+        if revision_date_str:
+            revision_tmstamp = int(time.
+                                   mktime(datetime.datetime
+                                           .strptime(revision_date_str, "%Y-%m-%d")
+                                           .timetuple()))
+        url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
         params = {'url': url, 'revision': revision, 'date': revision_tmstamp}
         conn = get_connection(params)
         if revision_tmstamp:
