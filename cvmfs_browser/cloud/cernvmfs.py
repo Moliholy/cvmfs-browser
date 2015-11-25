@@ -85,7 +85,7 @@ class CVMFilesystemObject(base.CloudObject):
 
         if not path.startswith(container.base_path):
             path = os.path.join(container.base_path, path)
-        dirent = container.conn.repository.lookup(path)
+        dirent = container.conn.get_current_revision().lookup(path)
         obj_type = cls.type_cls.SUBDIR if dirent.is_directory() \
             else cls.type_cls.FILE
         formatted_date = datetime.fromtimestamp(dirent.mtime)
@@ -116,7 +116,7 @@ class CVMFilesystemContainer(base.CloudContainer):
         """Get objects."""
         search_path = self.base_path
         dirents = [dirent for dirent in
-                   self.conn.repository.list_directory(search_path)
+                   self.conn.get_current_revision().list_directory(search_path)
                    if not dirent.is_symlink()]
         objs = [self.obj_cls.from_dirent(self, o) for o in dirents]
         return objs
@@ -127,7 +127,7 @@ class CVMFilesystemContainer(base.CloudContainer):
         return self.obj_cls.from_path(self, path)
 
     def get_closest_catalog_path(self):
-        return self.conn.repository  \
+        return self.conn.get_current_revision()  \
             .retrieve_catalog_for_path(self.base_path).root_prefix
 
     @property
@@ -140,7 +140,7 @@ class CVMFilesystemContainer(base.CloudContainer):
         """Create container from path."""
         path = path.strip(SEP)
         full_path = os.path.join(SEP, path)
-        dirent = conn.repository.lookup(full_path)
+        dirent = conn.get_current_revision().lookup(full_path)
         return cls(conn=conn, name=path, count=0, size=dirent.size)
 
 
@@ -166,8 +166,9 @@ class CVMFilesystemConnection(base.CloudConnection):
         else:
             self.revision = revision \
                 if revision != 'latest' else self.repository.manifest.revision
-            if revision != 'latest':
-                self.repository.switch_revision(self.revision)
+
+    def get_current_revision(self):
+        return self.repository.get_revision(self.revision)
 
     def get_tag_list(self):
         history = self.repository.retrieve_history()
@@ -184,7 +185,8 @@ class CVMFilesystemConnection(base.CloudConnection):
         return object()
 
     def get_statistics(self):
-        return self.repository.retrieve_root_catalog() \
+        revision = self.repository.get_revision(self.revision)
+        return revision.retrieve_root_catalog() \
             .get_statistics().get_all_fields()
 
     @wrap_fs_cont_errors
@@ -192,8 +194,9 @@ class CVMFilesystemConnection(base.CloudConnection):
         """Return available containers."""
         # get the list of directories
         path = '/' if not path else path
+        revision = self.repository.get_revision(self.revision)
         root_list = [os.path.join(path, dirent.name) for dirent in
-                     self.repository.list_directory(path)
+                     revision.list_directory(path)
                      if dirent.is_directory() and not dirent.is_symlink()]
         return [self.cont_cls.from_path(self, d) for d in root_list]
 
