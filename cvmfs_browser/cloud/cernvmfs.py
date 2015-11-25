@@ -53,6 +53,12 @@ class CVMFilesystemObject(base.CloudObject):
                 as file_obj:
             return file_obj.read()
 
+    def local_path(self):
+        """Return the path of this cached file inside the server """
+        with self.container.conn.repository.retrieve_object(self.content_hash) \
+                as file_obj:
+            return file_obj.name
+
     @property
     def path(self):
         """Base absolute path of container."""

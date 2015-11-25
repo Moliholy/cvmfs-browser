@@ -40,5 +40,6 @@ setup(
     install_requires=[
         'cvmfsutils >= 0.3.0',
         'Django >= 1.8',
+        'python-magic',
     ],
 )

@@ -2,6 +2,7 @@
 import os
 import time
 import datetime
+import magic
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -160,7 +161,7 @@ def document(_, repo_name, revision, path):
         raise Http404("No object at: %s" % object_path)
 
     # Get content-type and encoding.
-    content_type = storage_obj.smart_content_type
+    content_type = magic.from_file(storage_obj.local_path())
     encoding = storage_obj.smart_content_encoding
     response = HttpResponse(content=storage_obj.read(),
                             content_type=content_type)
