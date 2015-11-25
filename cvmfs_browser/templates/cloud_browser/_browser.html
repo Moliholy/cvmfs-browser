@@ -45,10 +45,12 @@
           {% else %}
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/places/folder.png' %}" /></td>
           {% endif %}
+        {% elif obj.is_symlink %}
+          <td><img src="{% cloud_browser_media_url 'img/custom/symlink.png' %}" /></td>
         {% else %}
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/mimetypes/text-x-generic.png' %}" /></td>
         {% endif %}
-        {% if obj.is_file %}
+        {% if obj.is_file or obj.is_symlink %}
         <td><a href="{% url 'cloud_browser_document' fqrn revision obj.path|urlencode %}"
             >{{ obj.basename }}</a></td>
         {% else %}

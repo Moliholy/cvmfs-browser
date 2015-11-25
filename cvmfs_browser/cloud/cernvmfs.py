@@ -49,15 +49,20 @@ class CVMFilesystemObject(base.CloudObject):
 
     def _read(self):
         """Return contents of object."""
+        if self.type == base.CloudObject.type_cls.SYMLINK:
+            return self.container.conn.repository \
+                .get_revision(self.container.conn.revision) \
+                .lookup(self.full_path).symlink
         with self.container.conn.repository.retrieve_object(self.content_hash) \
                 as file_obj:
             return file_obj.read()
 
     def local_path(self):
         """Return the path of this cached file inside the server """
-        with self.container.conn.repository.retrieve_object(self.content_hash) \
-                as file_obj:
-            return file_obj.name
+        if self.type == base.CloudObject.type_cls.FILE:
+            with self.container.conn.repository.retrieve_object(self.content_hash) \
+                    as file_obj:
+                return file_obj.name
 
     @property
     def path(self):
@@ -68,8 +73,12 @@ class CVMFilesystemObject(base.CloudObject):
     def from_dirent(cls, container, dirent):
         from datetime import datetime
 
-        obj_type = cls.type_cls.SUBDIR if dirent.is_directory() \
-            else cls.type_cls.FILE
+        if dirent.is_directory():
+            obj_type = cls.type_cls.SUBDIR
+        elif dirent.is_symlink():
+            obj_type = cls.type_cls.SYMLINK
+        else:
+            obj_type = cls.type_cls.FILE
         formatted_date = datetime.fromtimestamp(dirent.mtime)
         hash_type = ContentHashTypes.to_string(dirent.content_hash_type)
 
@@ -92,8 +101,12 @@ class CVMFilesystemObject(base.CloudObject):
         if not path.startswith(container.base_path):
             path = os.path.join(container.base_path, path)
         dirent = container.conn.get_current_revision().lookup(path)
-        obj_type = cls.type_cls.SUBDIR if dirent.is_directory() \
-            else cls.type_cls.FILE
+        if dirent.is_directory():
+            obj_type = cls.type_cls.SUBDIR
+        elif dirent.is_symlink():
+            obj_type = cls.type_cls.SYMLINK
+        else:
+            obj_type = cls.type_cls.FILE
         formatted_date = datetime.fromtimestamp(dirent.mtime)
         hash_type = ContentHashTypes.to_string(dirent.content_hash_type)
 
@@ -122,8 +135,7 @@ class CVMFilesystemContainer(base.CloudContainer):
         """Get objects."""
         search_path = self.base_path
         dirents = [dirent for dirent in
-                   self.conn.get_current_revision().list_directory(search_path)
-                   if not dirent.is_symlink()]
+                   self.conn.get_current_revision().list_directory(search_path)]
         objs = [self.obj_cls.from_dirent(self, o) for o in dirents]
         return objs
 
@@ -203,7 +215,7 @@ class CVMFilesystemConnection(base.CloudConnection):
         revision = self.repository.get_revision(self.revision)
         root_list = [os.path.join(path, dirent.name) for dirent in
                      revision.list_directory(path)
-                     if dirent.is_directory() and not dirent.is_symlink()]
+                     if dirent.is_directory()]
         return [self.cont_cls.from_path(self, d) for d in root_list]
 
     @wrap_fs_cont_errors

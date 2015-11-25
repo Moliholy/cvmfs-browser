@@ -164,7 +164,10 @@ def document(_, repo_name, revision, path):
         raise Http404("No object at: %s" % object_path)
 
     # Get content-type and encoding.
-    content_type = magic.from_file(storage_obj.local_path())
+    local_path = storage_obj.local_path()
+    content_type = None
+    if local_path:
+        content_type = magic.from_file(local_path)
     encoding = storage_obj.smart_content_encoding
     response = HttpResponse(content=storage_obj.read(),
                             content_type=content_type)

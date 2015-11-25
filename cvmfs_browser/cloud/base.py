@@ -11,6 +11,7 @@ class CloudObjectTypes(object):
     """Cloud object types helper."""
     FILE = 'file'
     SUBDIR = 'subdirectory'
+    SYMLINK = 'symlink'
 
 
 class CloudObject(object):
@@ -58,6 +59,11 @@ class CloudObject(object):
     def is_file(self):
         """Is a file object?"""
         return self.type == self.type_cls.FILE
+
+    @property
+    def is_symlink(self):
+        """Is a symlink object?"""
+        return self.type == self.type_cls.SYMLINK
 
     @property
     def path(self):
