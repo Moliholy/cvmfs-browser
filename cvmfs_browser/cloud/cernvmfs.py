@@ -164,7 +164,7 @@ class CVMFilesystemConnection(base.CloudConnection):
             history = self.repository.retrieve_history()
             self.revision = history.get_tag_by_date(timestamp).revision
         else:
-            self.revision = revision \
+            self.revision = int(revision) \
                 if revision != 'latest' else self.repository.manifest.revision
 
     def get_current_revision(self):
