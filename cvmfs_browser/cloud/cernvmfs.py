@@ -85,7 +85,7 @@ class CVMFilesystemObject(base.CloudObject):
         return cls(container,
                    name=dirent.name,
                    size=dirent.size,
-                   full_path=os.path.join([container.base_path , dirent.name.decode('ascii', 'replace')]),
+                   full_path=os.path.join(container.base_path , dirent.name.decode('ascii', 'replace')),
                    content_hash=dirent.content_hash,
                    content_hash_type=hash_type,
                    content_type=None,
