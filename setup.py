@@ -39,7 +39,7 @@ setup(
     data_files=[('', ['README.rst', 'INSTALL', 'COPYING'],)],
     install_requires=[
         'cvmfsutils >= 0.3.0',
-        'Django >= 1.8',
+        'Django == 1.8',
         'python-magic',
         'httpagentparser >= 1.7.8',
     ],
