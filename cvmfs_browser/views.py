@@ -4,6 +4,7 @@ import time
 import datetime
 import magic
 import urllib
+import httpagentparser
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -140,11 +141,15 @@ def browser(request, repo_name, revision='latest', path='',
 
 
 @settings_view_decorator
-def document(_, repo_name, revision, path):
+def document(request, repo_name, revision, path):
     """View single document from path.
 
     :param path: Path to resource, including container as first part of path.
     """
+    user_data = httpagentparser.detect(request.META['HTTP_USER_AGENT'])
+    if 'browser' not in user_data:
+        raise Http404('Only browsers are allowed to download files')
+
     path = urllib.unquote(path)
     container_path, object_path = path_parts(path)
     url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
