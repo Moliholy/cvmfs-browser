@@ -18,6 +18,11 @@ from cvmfs_browser.common import path_parts, path_join, path_yield
 MAX_LIMIT = get_connection_cls().cont_cls.max_list
 
 
+class HttpResponseNotAuthorized(HttpResponse):
+    status_code = 401
+    reason_phrase = 'Only browsers are allowed to download files'
+
+
 def settings_view_decorator(function):
     """Insert decorator from settings, if any.
 
@@ -148,7 +153,7 @@ def document(request, repo_name, revision, path):
     """
     user_data = httpagentparser.detect(request.META['HTTP_USER_AGENT'])
     if 'browser' not in user_data:
-        raise Http404('Only browsers are allowed to download files')
+        return HttpResponseNotAuthorized()
 
     path = urllib.unquote(path)
     container_path, object_path = path_parts(path)
