@@ -5,7 +5,8 @@ import datetime
 import magic
 import urllib
 import httpagentparser
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404,\
+    HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.importlib import import_module
@@ -16,11 +17,6 @@ from cvmfs_browser.common import path_parts, path_join, path_yield
 
 
 MAX_LIMIT = get_connection_cls().cont_cls.max_list
-
-
-class HttpResponseNotAuthorized(HttpResponse):
-    status_code = 401
-    reason_phrase = 'Only browsers are allowed to download files'
 
 
 def settings_view_decorator(function):
@@ -153,7 +149,7 @@ def document(request, repo_name, revision, path):
     """
     user_data = httpagentparser.detect(request.META['HTTP_USER_AGENT'])
     if 'browser' not in user_data:
-        return HttpResponseNotAuthorized()
+        return HttpResponseBadRequest()
 
     path = urllib.unquote(path)
     container_path, object_path = path_parts(path)
