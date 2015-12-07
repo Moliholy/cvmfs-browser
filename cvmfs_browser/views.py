@@ -4,6 +4,7 @@ import time
 import datetime
 import magic
 import urllib
+import re
 import httpagentparser
 from django.http import HttpResponse, Http404,\
     HttpResponseBadRequest, HttpResponseRedirect
@@ -94,9 +95,10 @@ def browser(request, repo_name, revision='latest', path='',
         params = {'url': url, 'revision': revision, 'date': revision_tmstamp}
         conn = get_connection(params)
         if revision_tmstamp:
-            pos = request.path[:-1].rfind('/')
+            res = re.findall('.*/cb/browser/[^/]+/[^/]+/', request.path)[0]
+            pos = res[:-1].rfind('/')
             new_url = '/'.join(
-                [request.path[0:pos], str(conn.revision), path])
+                [res[0:pos], str(conn.revision), path])
             return HttpResponseRedirect(new_url)
         if path == '/':
             containers = [conn.cont_cls.from_path(conn, path)]
