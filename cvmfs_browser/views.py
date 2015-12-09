@@ -6,6 +6,7 @@ import magic
 import urllib
 import re
 import httpagentparser
+import difflib
 from django.http import HttpResponse, Http404,\
     HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -183,3 +184,41 @@ def document(request, repo_name, revision, path):
         response['Content-Encoding'] = encoding
 
     return response
+
+@settings_view_decorator
+def diff(request, repo_name, revision1, revision2, path):
+    """Compare two documents in different revisions for a given path"""
+
+    user_data = httpagentparser.detect(request.META['HTTP_USER_AGENT'])
+    if 'browser' not in user_data:
+        return HttpResponseBadRequest()
+
+    contents = []
+    path = urllib.unquote(path)
+    container_path, object_path = path_parts(path)
+    url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
+    for revision in [revision1, revision2]:
+        params = {'url': url, 'revision': revision, 'date': None}
+        conn = get_connection(params)
+        try:
+            container = conn.get_container(container_path)
+        except errors.NoContainerException:
+            raise Http404("No container at: %s" % container_path)
+        except errors.NotPermittedException:
+            raise Http404("Access denied for container at: %s" % container_path)
+
+        try:
+            storage_obj = container.get_object(object_path)
+        except errors.NoObjectException:
+            raise Http404("No object at: %s" % object_path)
+        contents.append(storage_obj.read())
+
+    differ = difflib.HtmlDiff(tabsize=4, wrapcolumn=80)
+    final_diff_text = differ.make_file(
+        fromdesc=str(revision1),
+        todesc=str(revision2),
+        fromlines=contents[0].split('\n'),
+        tolines=contents[1].split('\n'))
+
+    return HttpResponse(content=final_diff_text,
+                        content_type='text/html')

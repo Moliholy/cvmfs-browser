@@ -15,4 +15,6 @@ urlpatterns = patterns(
         'document', name="cloud_browser_document"),
     url(r'^document/(?P<repo_name>[a-z\.\-0-9]+)/(?P<revision>[^\/]*)/(?P<path>.*)$',
         'document', name="cloud_browser_document"),
+    url(r'^diff/(?P<repo_name>[a-z\.\-0-9]+)/(?P<revision1>[^\/]*)/(?P<revision2>[^\/]*)/(?P<path>.*)$',
+        'diff', name="cloud_browser_diff"),
 )
