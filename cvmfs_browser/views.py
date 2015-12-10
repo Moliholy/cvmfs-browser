@@ -246,7 +246,7 @@ def diff(request, repo_name, revision1, revision2, path):
         contents.append(storage_obj.read())
 
     differ = difflib.HtmlDiff(tabsize=4, wrapcolumn=80)
-    if 'text/' in content_type:
+    if 'application/octet-stream' not in content_type:
         final_diff_text = differ.make_table(
             fromdesc=str(revision1),
             todesc=str(revision2),
