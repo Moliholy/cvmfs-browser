@@ -123,6 +123,30 @@ table#cloud-browser-objects-table tbody a:hover {
     text-decoration: underline;
 }
 
+/** Diff button **/
+img.diff_btn {
+    cursor: pointer;
+    visibility: hidden;
+    float: right;
+}
+table#cloud-browser-objects-table tbody tr:hover img.diff_btn {
+    visibility: visible;
+}
+#diff_float {
+    background-color: #F0F0F0;
+    border: solid 1px #999;
+    position: absolute;
+    padding: 5px;
+    left: 0px;
+    top: 0px;
+    display: none;
+}
+element.style {
+    left: 0px;
+    top: 0px;
+    display: none;
+}
+
 /** Messages */
 .cloud-browser-empty {
     text-align: center;

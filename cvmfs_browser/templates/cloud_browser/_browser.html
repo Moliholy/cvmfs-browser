@@ -7,6 +7,30 @@
 {% load cloud_browser_extras %}
 
 {% block cloud_browser_content %}
+<div id="diff_float">
+    <form id="diff_form" target="_blank" method="GET"
+          onsubmit="return submitDiffForm()">
+        <table>
+            <tr>
+                <td>
+                    <input type="text" name="compare_revision_number"
+                           placeholder="Revision number">
+                </td>
+            </tr>
+            <tr>
+                <input type="date" name="compare_revision_date">
+                <input id="diff_form_file" type="hidden"
+                       name="compare_file">
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" value="Compare">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
 <div id="cloud-browser-all" class="cloud-browser-defaults">
 <div id="cloud-browser-containers">
 <ul>
@@ -51,8 +75,13 @@
             <td><img src="{% cloud_browser_media_url 'img/tango/16x16/mimetypes/text-x-generic.png' %}" /></td>
         {% endif %}
         {% if obj.is_file or obj.is_symlink %}
-        <td><a href="{% url 'cloud_browser_document' fqrn revision obj.path|urlencode %}"
-            >{{ obj.basename }}</a></td>
+        <td>
+            <a href="{% url 'cloud_browser_document' fqrn revision obj.path|urlencode %}">{{ obj.basename }}</a>
+          {% if obj.is_file %}
+            <img class="diff_btn" alt="[diff]" title="{{ obj.basename }}"
+                 src="{% cloud_browser_media_url 'img/custom/diff.png' %}">
+          {% endif %}
+        </td>
         {% else %}
         <td><a href="{% url 'cloud_browser_browser' fqrn revision obj.path|urlencode %}"
                class="cloud-browser-document-link"

@@ -9,7 +9,7 @@ import httpagentparser
 import difflib
 from django.http import HttpResponse, Http404,\
     HttpResponseBadRequest, HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.utils.importlib import import_module
 
@@ -62,10 +62,15 @@ def _breadcrumbs(path):
 
     return crumbs
 
+def _date_str_to_timestamp(date_str):
+    if date_str:
+        return int(time
+               .mktime(datetime.datetime.strptime(date_str, "%Y-%m-%d")
+               .timetuple()))
+
 
 @settings_view_decorator
-def browser(request, repo_name, revision='latest', path='',
-            template='cloud_browser/browser.html'):
+def browser(request, repo_name, revision='latest', path=''):
     """View files in a file path.
 
     :param request: The request.
@@ -83,24 +88,49 @@ def browser(request, repo_name, revision='latest', path='',
     page = incoming['page'] if 'page' in incoming else '0'
     revision_date_str = incoming['revision_date'] \
         if 'revision_date' in incoming else None
+    compare_revision_number = incoming['compare_revision_number'] \
+        if 'compare_revision_number' in incoming else None
+    compare_revision_date = incoming['compare_revision_date'] \
+        if 'compare_revision_date' in incoming else None
+    file_name = incoming['compare_file'] \
+        if 'compare_file' in incoming else None
 
-    revision_tmstamp = None
-    
+    revision_tmstamp = _date_str_to_timestamp(revision_date_str)
+    compare_revision_tmstamp = _date_str_to_timestamp(compare_revision_date)
+
     try:
-        if revision_date_str:
-            revision_tmstamp = int(time.
-                                   mktime(datetime.datetime
-                                           .strptime(revision_date_str, "%Y-%m-%d")
-                                           .timetuple()))
         url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
         params = {'url': url, 'revision': revision, 'date': revision_tmstamp}
         conn = get_connection(params)
-        if revision_tmstamp:
-            res = re.findall('.*/cb/browser/[^/]+/[^/]+/', request.path)[0]
-            pos = res[:-1].rfind('/')
-            new_url = '/'.join(
-                [res[0:pos], str(conn.revision), path])
+
+        # check the GET parameters
+        if compare_revision_date or compare_revision_number or revision_tmstamp:
+            res = re.findall('.*/cb/[a-z]+/[^/]+/[^/]+/', request.path)[0]
+            pos_revision = res[:-1].rfind('/')
+            pos_repo = res[:pos_revision].rfind('/')
+            pos_method = res[:pos_repo].rfind('/')
+            new_url = ''
+            if compare_revision_number:
+                new_url = '/'.join(
+                    [res[0:pos_method], 'diff', repo_name, revision,
+                     compare_revision_number, path, file_name])
+                return HttpResponseRedirect(new_url)
+            elif compare_revision_date:
+                params = {'url': url, 'revision': revision, 'date': compare_revision_tmstamp}
+                conn = get_connection(params)
+                new_url = '/'.join(
+                    [res[0:pos_method], 'diff', repo_name, revision,
+                     str(conn.revision), path, file_name])
+            elif revision_tmstamp:
+                new_url = '/'.join(
+                    [res[0:pos_revision], str(conn.revision), path])
+
             return HttpResponseRedirect(new_url)
+
+        # if there are no GET parameters we proceed normally
+        url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
+        params = {'url': url, 'revision': revision, 'date': revision_tmstamp}
+        conn = get_connection(params)
         if path == '/':
             containers = [conn.cont_cls.from_path(conn, path)]
         else:
@@ -125,7 +155,7 @@ def browser(request, repo_name, revision='latest', path='',
     current_tag = conn.get_tag_by_revision()
     revision_date = str(current_tag.timestamp.date())
 
-    return render_to_response(template,
+    return render_to_response('cloud_browser/browser.html',
                               {'path': path,
                                'revision': revision,
                                'tag_list': tag_list,
@@ -176,7 +206,7 @@ def document(request, repo_name, revision, path):
     local_path = storage_obj.local_path()
     content_type = None
     if local_path:
-        content_type = magic.from_file(local_path)
+        content_type = magic.from_file(local_path, mime=True)
     encoding = storage_obj.smart_content_encoding
     response = HttpResponse(content=storage_obj.read(),
                             content_type=content_type)
@@ -197,6 +227,7 @@ def diff(request, repo_name, revision1, revision2, path):
     path = urllib.unquote(path)
     container_path, object_path = path_parts(path)
     url = settings.CLOUD_BROWSER_CVMFS_URL_MAPPING[repo_name]
+    content_type = 'text/*'
     for revision in [revision1, revision2]:
         params = {'url': url, 'revision': revision, 'date': None}
         conn = get_connection(params)
@@ -211,14 +242,19 @@ def diff(request, repo_name, revision1, revision2, path):
             storage_obj = container.get_object(object_path)
         except errors.NoObjectException:
             raise Http404("No object at: %s" % object_path)
+        content_type = magic.from_file(storage_obj.local_path(), mime=True)
         contents.append(storage_obj.read())
 
     differ = difflib.HtmlDiff(tabsize=4, wrapcolumn=80)
-    final_diff_text = differ.make_file(
-        fromdesc=str(revision1),
-        todesc=str(revision2),
-        fromlines=contents[0].split('\n'),
-        tolines=contents[1].split('\n'))
+    if 'text/' in content_type:
+        final_diff_text = differ.make_table(
+            fromdesc=str(revision1),
+            todesc=str(revision2),
+            fromlines=contents[0].split('\n'),
+            tolines=contents[1].split('\n')
+        )
+    else:
+        final_diff_text = 'The file contains binary data and cannot be processed'
 
-    return HttpResponse(content=final_diff_text,
-                        content_type='text/html')
+    return render(request, 'cloud_browser/comparison.html',
+                  {'table': final_diff_text})

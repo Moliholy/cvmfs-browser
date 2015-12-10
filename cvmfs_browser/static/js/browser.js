@@ -63,3 +63,37 @@ var CloudBrowser = {
         return CloudBrowser.toQueryString(queryObj);
     }
 };
+
+
+function align(to_this) {
+    var cr = to_this.getClientRects()[0];
+    var floater = document.getElementById('diff_float');
+    floater.style.left = cr.left+'px';
+    floater.style.top = (cr.top+24)+'px';
+}
+
+window.onload = function () {
+    var e = document.getElementsByClassName("diff_btn");
+    for (i = 0; i < e.length; i++) {
+        e[i].addEventListener('click',
+            function (e) {
+                e.stopPropagation();
+                var floating_dialog = document.getElementById('diff_float');
+                floating_dialog.style.display = 'block';
+                floating_dialog.title = e.target.title;
+                align(e.target);
+            });
+    }
+    document.body.addEventListener('click', function() {
+        document.getElementById('diff_float').style.display = 'none';
+    });
+    document.getElementById('diff_float')
+        .addEventListener('click', function(e) { e.stopPropagation(); });
+}
+
+function submitDiffForm() {
+    var title = document.getElementById('diff_float').title;
+    document.getElementById('diff_form_file').value = title;
+    document.getElementById("diff_form").submit();
+    return false;
+}
