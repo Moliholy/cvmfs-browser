@@ -132,7 +132,7 @@ img.diff_btn {
 table#cloud-browser-objects-table tbody tr:hover img.diff_btn {
     visibility: visible;
 }
-#diff_float {
+div#diff_float {
     background-color: #F0F0F0;
     border: solid 1px #999;
     position: absolute;
